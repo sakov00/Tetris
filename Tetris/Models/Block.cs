@@ -4,15 +4,15 @@ namespace Tetris.Models
 {
     public class Block
     {
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
-        public Position[][] Tiles { get; set; }
+        public virtual Position[][] Tiles { get; set; }
 
-        public Position StartOffset { get; set; }
+        public virtual Position StartOffset { get; set; }
 
-        public int RotationState { get; set; }
+        public virtual int RotationState { get; set; }
 
-        public Position Offset { get; set; }
+        public virtual Position Offset { get; set; }
 
         public Block()
         {

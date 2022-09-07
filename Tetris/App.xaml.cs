@@ -16,7 +16,7 @@ namespace Tetris
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            StartupUri = new Uri("/Tetris; component/Views/MainWindow.xaml", UriKind.Relative);
+            StartupUri = new Uri("/Tetris;component/Views/MainWindow.xaml", UriKind.Relative);
             AutofacConfig.ConfigureContainer();
         }
     }

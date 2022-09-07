@@ -15,16 +15,12 @@ namespace Tetris.Containers
             builder.RegisterType<Block>();
             builder.RegisterType<Position>();
 
-            builder.RegisterType<BlockQueueViewModel>();
             builder.RegisterType<GameGridViewModel>();
-            builder.RegisterType<GameStateViewModel>();
             builder.RegisterType<WorkBlocksViewModel>();
-            var gameGrid = builder.Build();
+            builder.RegisterType<ManageCanvasViewModel>();
             builder.RegisterType<MainViewModel>();
 
             GetContainer = builder.Build();
-
-            GetContainer.Resolve<MainViewModel>();
         }
     }
 }

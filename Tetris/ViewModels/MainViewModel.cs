@@ -2,23 +2,11 @@
 {
     internal class MainViewModel : BaseViewModel
     {
-        private BlockQueueViewModel blockQueueVM;
-
         private WorkBlocksViewModel workBlocksVM;
-
-        private GameStateViewModel gameStateVM;
 
         private GameGridViewModel gameGridVM;
 
-        public BlockQueueViewModel BlockQueueVM
-        {
-            get => blockQueueVM;
-            set
-            {
-                blockQueueVM = value;
-                OnPropertyChanged();
-            }
-        }
+        private ManageCanvasViewModel manageCanvasVM;
 
         public WorkBlocksViewModel WorkBlocksVM
         {
@@ -29,19 +17,6 @@
                 OnPropertyChanged();
             }
         }
-
-
-        public GameStateViewModel GameStateVM
-        {
-            get => gameStateVM;
-            set
-            {
-                gameStateVM = value;
-                OnPropertyChanged();
-            }
-        }
-
-
 
         public GameGridViewModel GameGridVM
         {
@@ -54,13 +29,25 @@
             }
         }
 
-        public MainViewModel(BlockQueueViewModel blockQueueVM,
-            WorkBlocksViewModel workBlocksViewModel, GameStateViewModel gameStateVM, GameGridViewModel gameGridVM)
+        public ManageCanvasViewModel ManageCanvasVM
         {
-            BlockQueueVM = blockQueueVM;
+            get => manageCanvasVM;
+            set
+            {
+                manageCanvasVM = value;
+                OnPropertyChanged();
+
+            }
+        }
+
+        public MainViewModel(WorkBlocksViewModel workBlocksViewModel, GameGridViewModel gameGridVM, ManageCanvasViewModel manageCanvasVM)
+        {
             WorkBlocksVM = workBlocksViewModel;
-            GameStateVM = gameStateVM;
             GameGridVM = gameGridVM;
+            WorkBlocksVM.GameGridVM = GameGridVM;
+            ManageCanvasVM = manageCanvasVM;
+            ManageCanvasVM.GameGridVM = GameGridVM;
+            ManageCanvasVM.WorkBlocksVM = WorkBlocksVM;
         }
     }
 }

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tetris.ViewModels
+﻿namespace Tetris.ViewModels
 {
-    internal class GameGridViewModel
+    internal class GameGridViewModel : BaseViewModel
     {
         private readonly int[,] grid;
-        public int Rows { get; }
-        public int Columns { get; }
+        public int Rows { get; set; }
+        public int Columns { get; set; }
 
         public int this[int r, int c]
         {
@@ -18,7 +12,7 @@ namespace Tetris.ViewModels
             set => grid[r, c] = value;
         }
 
-        public GameGridViewModel(int rows, int columns)
+        public GameGridViewModel(int rows=22, int columns=10)
         {
             Rows = rows;
             Columns = columns;
