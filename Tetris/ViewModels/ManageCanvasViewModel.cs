@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Tetris.Commands;
@@ -42,6 +43,11 @@ namespace Tetris.ViewModels
 
         private void GameCanvas_Executed(object param)
         {
+            if (DrawVM.GameGridVM.Columns < 15 || DrawVM.GameGridVM.Rows < 20)
+            {
+                MessageBox.Show("The minimum values for the size of the playing field are 15 columns and 20 rows");
+                return;
+            }
             DrawVM.SetupGameCanvas((Canvas)param);
             StartVisibility = false;
             DrawVM.GameGridVM.SizeCanvasVisibility = false;
