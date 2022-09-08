@@ -38,7 +38,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.Background>
-            <ImageBrush ImageSource="C:\Work\Tetris\Tetris\Assets\Background.png"/>
+            <ImageBrush ImageSource="/Tetris;component/Assets/Background.png"/>
         </Grid.Background>
 
         <Viewbox Grid.Row="1"

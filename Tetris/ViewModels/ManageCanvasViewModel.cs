@@ -14,26 +14,27 @@ namespace Tetris.ViewModels
     {
         private readonly ImageSource[] tileImages = new ImageSource[]
         {
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileEmpty.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileCyan.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileBlue.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileOrange.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileYellow.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileGreen.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TilePurple.png", UriKind.Absolute)),
-            new BitmapImage(new Uri(@"C:\Work\Tetris\Tetris\Assets\TileRed.png", UriKind.Absolute))
+            new BitmapImage(new Uri("Assets/TileEmpty.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TileCyan.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TileBlue.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TileOrange.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TileYellow.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TileGreen.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TilePurple.png", UriKind.Relative)),
+            new BitmapImage(new Uri("Assets/TileRed.png", UriKind.Relative))
         };
 
         private readonly string[] blockImages = new string[]
         {
-            @"C:\Work\Tetris\Tetris\Assets\Block-Empty.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-I.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-J.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-L.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-O.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-S.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-T.png",
-            @"C:\Work\Tetris\Tetris\Assets\Block-Z.png",
+            new Uri("pack://application:,,,/Assets/Block-Empty.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-I.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-J.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-L.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-O.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-S.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-T.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-Z.png").AbsoluteUri,
+            new Uri("pack://application:,,,Assets/Block-Empty.png").AbsoluteUri,
         };
 
         private Image[,] imageControls;
