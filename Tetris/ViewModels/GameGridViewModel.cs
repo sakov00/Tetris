@@ -1,8 +1,23 @@
-﻿namespace Tetris.ViewModels
+﻿using System.Windows.Controls;
+
+namespace Tetris.ViewModels
 {
     internal class GameGridViewModel : BaseViewModel
     {
+
         public int[,] Grid { get; set; }
+
+        public bool SizeCanvasVisibility
+        {
+            get => sizeCanvasVisibility;
+            set
+            {
+                sizeCanvasVisibility = value;
+                OnPropertyChanged();
+
+            }
+        }
+        private bool sizeCanvasVisibility = true;
 
         public int Rows
         {
@@ -13,7 +28,7 @@
                 OnPropertyChanged();
             }
         }
-        private int rows = 25;
+        private int rows;
 
         public int Columns
         {
@@ -24,7 +39,7 @@
                 OnPropertyChanged();
             }
         }
-        private int columns=15;
+        private int columns;
 
         public int this[int r, int c]
         {
@@ -104,5 +119,7 @@
 
             return cleared;
         }
+
+        
     }
 }

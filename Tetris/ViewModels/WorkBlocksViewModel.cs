@@ -4,7 +4,7 @@ using Tetris.Models;
 
 namespace Tetris.ViewModels
 {
-    internal class WorkBlocksViewModel : BaseViewModel
+    internal abstract class WorkBlocksViewModel : BaseViewModel
     {
         private readonly Random random = new Random();
 
@@ -19,9 +19,9 @@ namespace Tetris.ViewModels
             typeof(ZBlock)
         };
 
-        public Block CurrentBlock { get; private set; }
+        public Block CurrentBlock { get; set; }
 
-        public Block NextBlock { get; private set; }
+        public Block NextBlock { get; set; }
 
         public GameGridViewModel GameGridVM { get; set; }
 
@@ -48,13 +48,6 @@ namespace Tetris.ViewModels
             }
         }
         private bool gameOver;
-
-        public WorkBlocksViewModel(GameGridViewModel gameGridVM)
-        {
-            GameGridVM = gameGridVM;
-            NextBlock = RandomBlock();
-            CurrentBlock = RandomBlock();
-        }
 
         #region KeyManage
 
@@ -169,15 +162,24 @@ namespace Tetris.ViewModels
             }
         }
 
+        public Block GetAndUpdate()
+        {
+            Block block = NextBlock;
+            do
+            {
+                NextBlock = RandomBlock();
+            }
+            while (block.Id == NextBlock.Id);
+            return block;
+        }
+
         public int BlockDropDistance()
         {
             int drop = GameGridVM.Rows;
-
             foreach (Position p in TilePositions())
             {
                 drop = Math.Min(drop, TileDropDistance(p));
             }
-
             return drop;
         }
 
@@ -192,25 +194,11 @@ namespace Tetris.ViewModels
         private int TileDropDistance(Position p)
         {
             int drop = 0;
-
             while (GameGridVM.IsEmpty(p.Row + drop + 1, p.Column))
             {
                 drop++;
             }
-
             return drop;
-        }
-
-        public Block GetAndUpdate()
-        {
-            Block block = NextBlock;
-            block.StartOffset = new Position(GameGridVM.Rows / 2, GameGridVM.Columns / 2);
-            do
-            {
-                NextBlock = RandomBlock();
-            }
-            while (block.Id == NextBlock.Id);
-            return block;
         }
 
         public void Reset()
@@ -219,7 +207,7 @@ namespace Tetris.ViewModels
             CurrentBlock.StartOffset = new Position(0,0);
         }
 
-        private Block RandomBlock()
+        public Block RandomBlock()
         {
             var block = (Block)Activator.CreateInstance(blocksTypes[random.Next(blocksTypes.Length)]);
             int middleOnCanvas = (GameGridVM.Columns / 2) - 1;

@@ -16,7 +16,7 @@ namespace Tetris.Containers
             builder.RegisterType<Position>();
 
             builder.RegisterType<GameGridViewModel>();
-            builder.RegisterType<WorkBlocksViewModel>();
+            builder.RegisterType<DrawViewModel>();
             builder.RegisterType<ManageCanvasViewModel>();
 
             GetContainer = builder.Build();
