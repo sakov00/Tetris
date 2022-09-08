@@ -16,18 +16,16 @@
     </Window.Resources>
 
     <Window.InputBindings>
-        <KeyBinding Key="Up" Command="{Binding WorkBlocksVM.RotateBlockCW}"/>
-        <KeyBinding Key="Down" Command="{Binding WorkBlocksVM.MoveBlockDown}"/>
-        <KeyBinding Key="Left" Command="{Binding WorkBlocksVM.MoveBlockLeft}"/>
-        <KeyBinding Key="Right" Command="{Binding WorkBlocksVM.MoveBlockRight}"/>
-        <KeyBinding Key="Z" Command="{Binding WorkBlocksVM.RotateBlockCCW}"/>
-        <KeyBinding Key="C" Command="{Binding WorkBlocksVM.HoldBlock}"/>
-        <KeyBinding Key="Space" Command="{Binding WorkBlocksVM.DropBlock}"/>
+        <KeyBinding Key="Up" Command="{Binding RotateBlockCW}"/>
+        <KeyBinding Key="Down" Command="{Binding MoveBlockDown}"/>
+        <KeyBinding Key="Left" Command="{Binding MoveBlockLeft}"/>
+        <KeyBinding Key="Right" Command="{Binding MoveBlockRight}"/>
+        <KeyBinding Key="Z" Command="{Binding RotateBlockCCW}"/>
+        <KeyBinding Key="Space" Command="{Binding DropBlock}"/>
     </Window.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -41,74 +39,75 @@
             <ImageBrush ImageSource="/Tetris;component/Assets/Background.png"/>
         </Grid.Background>
 
-        <Viewbox Grid.Row="1"
-                 Grid.Column="1"
-                 Margin="0,0,0,20">
-            <StackPanel>
+        <StackPanel Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" Margin="80,0,0,0">
+            <WrapPanel  HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Score:"/>
+                <TextBlock Text="{Binding WorkBlocksVM.Score}"/>
+            </WrapPanel>
             <Canvas x:Name="GameCanvas"
                     Background="#101010"
-                    Width="250"
-                    Height="510"
-                    ClipToBounds="True"/>
-            <Button Content="Start" 
-        Command="{Binding ManageCanvasVM.GameCanvasCommand}" 
-        CommandParameter="{Binding ElementName=GameCanvas}"/>
-            </StackPanel>
-        </Viewbox>
-
-        <TextBlock x:Name="ScoreText"
-                   Grid.Row="0"
-                   Grid.Column="1"
-                   Text="Score: "
-                   Margin="0, 10"
-                   TextAlignment="Center"/>
-        <StackPanel Grid.Row="1"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right">
-            <TextBlock Text="Hold"
-                       TextAlignment="Center"/>
-
-            <Image x:Name="HoldImage"
-                   Source="{Binding ManageCanvasVM.HoldImage}"
-                   Margin="20"
-                   Width="125"/>
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1"
+        <StackPanel Grid.Row="0"
                     Grid.Column="2"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left">
             <TextBlock Text="Next"
                        TextAlignment="Center"/>
-
             <Image x:Name="NextImage"
-                   Source="{Binding ManageCanvasVM.NextImage}"
+                   Source="{Binding NextImage}"
                    Margin="20"
                    Width="125"/>
+            <Button Content="Start" 
+                Width="100"
+                Height="50"
+                Visibility="{Binding StartVisibility, Converter={StaticResource BoolToVis}, UpdateSourceTrigger=PropertyChanged}"
+                Command="{Binding GameCanvas}" 
+                CommandParameter="{Binding ElementName=GameCanvas}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right">
+            <TextBlock Text="Size Canvas"
+                       TextAlignment="Center"/>
+            <WrapPanel Margin="0,10,0,10">
+                <TextBlock Text="Rows "/>
+                <TextBox Text="{Binding GameGridVM.Rows}" Width="50"/>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Columns "/>
+                <TextBox Text="{Binding GameGridVM.Columns}" Width="50"/>
+            </WrapPanel>
         </StackPanel>
 
         <Grid x:Name="GameOverMenu"
               Background="#CC000000"
-              Grid.RowSpan="2"
               Grid.ColumnSpan="3"
-              Visibility="{Binding ManageCanvasVM.GameOverVisibility, Converter={StaticResource BoolToVis}, UpdateSourceTrigger=PropertyChanged}">
+              Visibility="{Binding WorkBlocksVM.GameOver, Converter={StaticResource BoolToVis}, UpdateSourceTrigger=PropertyChanged}">
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center">
                 <TextBlock Text="Game Over"
                            FontSize="48"
                            TextAlignment="Center"/>
-
-                <TextBlock x:Name="FinalScoreText"
-                           Text="{Binding ManageCanvasVM.FinalScoreText}"
-                           FontSize="36"
-                           TextAlignment="Center"/>
+                <WrapPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="Score:" FontSize="36"/>
+                    <TextBlock Text="{Binding WorkBlocksVM.Score}" FontSize="36"/>
+                </WrapPanel>
 
                 <Button Content="Play Again"
                         Background="LightGreen"
                         Margin="0,20,0,0"
                         Padding="5"
-                        Command="{Binding ManageCanvasVM.PlayAgainCommand}"/>
+                        Command="{Binding PlayAgain}"/>
             </StackPanel>
         </Grid>
     </Grid>

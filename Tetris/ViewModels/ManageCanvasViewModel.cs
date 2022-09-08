@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,33 +13,30 @@ namespace Tetris.ViewModels
     {
         private readonly ImageSource[] tileImages = new ImageSource[]
         {
-            new BitmapImage(new Uri("Assets/TileEmpty.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TileCyan.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TileBlue.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TileOrange.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TileYellow.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TileGreen.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TilePurple.png", UriKind.Relative)),
-            new BitmapImage(new Uri("Assets/TileRed.png", UriKind.Relative))
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileEmpty.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileCyan.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileBlue.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileOrange.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileYellow.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileGreen.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TilePurple.png", UriKind.Relative)),
+            new BitmapImage(new Uri("/Tetris;component/Assets/TileRed.png", UriKind.Relative))
         };
 
         private readonly string[] blockImages = new string[]
         {
-            new Uri("pack://application:,,,/Assets/Block-Empty.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-I.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-J.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-L.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-O.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-S.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-T.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-Z.png").AbsoluteUri,
-            new Uri("pack://application:,,,Assets/Block-Empty.png").AbsoluteUri,
+            "/Tetris;component/Assets/Block-Empty.png",
+            "/Tetris;component/Assets/Block-I.png",
+            "/Tetris;component/Assets/Block-J.png",
+            "/Tetris;component/Assets/Block-L.png",
+            "/Tetris;component/Assets/Block-O.png",
+            "/Tetris;component/Assets/Block-S.png",
+            "/Tetris;component/Assets/Block-T.png",
+            "/Tetris;component/Assets/Block-Z.png",
+            "/Tetris;component/Assets/Block-Empty.png"
         };
 
         private Image[,] imageControls;
-        private readonly int maxDelay = 1000;
-        private readonly int minDelay = 75;
-        private readonly int delayDecrease = 25;
 
         public string NextImage
         {
@@ -54,41 +50,17 @@ namespace Tetris.ViewModels
         }
         private string nextImage;
 
-        public string HoldImage
+        public bool StartVisibility
         {
-            get => holdImage;
+            get => startVisibility;
             set
             {
-                holdImage = value;
+                startVisibility = value;
                 OnPropertyChanged();
 
             }
         }
-        private string holdImage;
-
-        public bool GameOverVisibility
-        {
-            get => gameOverVisibility;
-            set
-            {
-                gameOverVisibility = value;
-                OnPropertyChanged();
-
-            }
-        }
-        private bool gameOverVisibility;
-
-        public string FinalScoreText
-        {
-            get => finalScoreText;
-            set
-            {
-                finalScoreText = value;
-                OnPropertyChanged();
-
-            }
-        }
-        private string finalScoreText;
+        private bool startVisibility = true;
 
         public GameGridViewModel GameGridVM { get; set; }
 
@@ -96,9 +68,121 @@ namespace Tetris.ViewModels
 
         public ManageCanvasViewModel()
         {
-            GameCanvasCommand = new RelayCommand(GameCanvas_Executed);
-            PlayAgainCommand = new RelayCommand(PlayAgain_Executed);
+            GameGridVM = new GameGridViewModel();
+            WorkBlocksVM = new WorkBlocksViewModel(GameGridVM);
+            GameCanvas = new RelayCommand(GameCanvas_Executed);
+            PlayAgain = new RelayCommand(PlayAgain_Executed);
+            MoveBlockLeft = new RelayCommand(MoveBlockLeft_Executed);
+            MoveBlockRight = new RelayCommand(MoveBlockRight_Executed);
+            MoveBlockDown = new RelayCommand(MoveBlockDown_Executed);
+            RotateBlockCW = new RelayCommand(RotateBlockCW_Executed);
+            RotateBlockCCW = new RelayCommand(RotateBlockCCW_Executed);
+            DropBlock = new RelayCommand(DropBlock_Executed);
         }
+
+        #region Commands
+
+        #region --- GameCanvas ---
+
+        public ICommand GameCanvas { get; private set; }
+
+        private async void GameCanvas_Executed(object param)
+        {
+            SetupGameCanvas(GameGridVM, (Canvas)param);
+            await GameLoop();
+        }
+
+        #endregion --- GameCanvas ---
+
+        #region --- PlayAgain ---
+
+        public ICommand PlayAgain { get; private set; }
+
+        private void PlayAgain_Executed(object param)
+        {
+            GameGridVM = new GameGridViewModel();
+            WorkBlocksVM.GameGridVM = GameGridVM;
+            WorkBlocksVM.GameOver = false;
+            GameGridVM.Grid = new int[GameGridVM.Rows, GameGridVM.Columns];
+            WorkBlocksVM.Score = 0;
+            GameLoop();
+        }
+
+        #endregion --- PlayAgain ---
+
+        #region --- MoveBlockLeft ---
+
+        public ICommand MoveBlockLeft { get; private set; }
+
+        private void MoveBlockLeft_Executed(object param)
+        {
+            WorkBlocksVM.MoveBlockLeft();
+            Draw();
+        }
+
+        #endregion --- MoveBlockLeft ---
+
+        #region --- MoveBlockRight ---
+
+        public ICommand MoveBlockRight { get; private set; }
+
+        private void MoveBlockRight_Executed(object param)
+        {
+            WorkBlocksVM.MoveBlockRight();
+            Draw();
+        }
+
+        #endregion --- MoveBlockRight ---
+
+        #region --- MoveBlockDown ---
+
+        public ICommand MoveBlockDown { get; private set; }
+
+        private void MoveBlockDown_Executed(object param)
+        {
+            WorkBlocksVM.MoveBlockDown();
+            Draw();
+        }
+
+        #endregion --- MoveBlockRight ---
+
+        #region --- RotateBlockCW ---
+
+        public ICommand RotateBlockCW { get; private set; }
+
+        private void RotateBlockCW_Executed(object param)
+        {
+            WorkBlocksVM.RotateBlockCW();
+            Draw();
+        }
+
+        #endregion --- RotateBlockCW ---
+
+        #region --- RotateBlockCCW ---
+
+        public ICommand RotateBlockCCW { get; private set; }
+
+        private void RotateBlockCCW_Executed(object param)
+        {
+            WorkBlocksVM.RotateBlockCCW();
+            Draw();
+        }
+
+        #endregion --- RotateBlockCCW ---
+
+        #region --- DropBlock ---
+
+        public ICommand DropBlock { get; private set; }
+
+        private void DropBlock_Executed(object param)
+        {
+            WorkBlocksVM.DropBlock();
+            Draw();
+        }
+
+        #endregion --- DropBlock ---
+
+        #endregion Commands
 
         private Image[,] SetupGameCanvas(GameGridViewModel grid, Canvas gameCanvas)
         {
@@ -115,42 +199,18 @@ namespace Tetris.ViewModels
                         Height = cellSize
                     };
 
-                    Canvas.SetTop(imageControl, (r - 2) * cellSize + 10);
+                    Canvas.SetTop(imageControl, r * cellSize);
                     Canvas.SetLeft(imageControl, c * cellSize);
                     gameCanvas.Children.Add(imageControl);
                     imageControls[r, c] = imageControl;
                 }
             }
-
+            gameCanvas.Width = cellSize * grid.Columns;
+            gameCanvas.Height = cellSize * grid.Rows;
+            StartVisibility = false;
+            grid.Grid = new int[grid.Rows, grid.Columns];
             return imageControls;
         }
-        #region Commands
-
-        #region --- GameCanvas ---
-
-        public ICommand GameCanvasCommand { get; private set; }
-
-        private async void GameCanvas_Executed(object param)
-        {
-            SetupGameCanvas(GameGridVM, (Canvas)param);
-            await GameLoop();
-        }
-
-        #endregion --- GameCanvas ---
-
-        #region --- PlayAgain ---
-
-        public ICommand PlayAgainCommand { get; private set; }
-
-        private async void PlayAgain_Executed(object param)
-        {
-            GameOverVisibility = false;
-            await GameLoop();
-        }
-
-        #endregion --- PlayAgain ---
-
-        #endregion Commands
 
         private async Task GameLoop()
         {
@@ -158,23 +218,21 @@ namespace Tetris.ViewModels
 
             while (!WorkBlocksVM.GameOver)
             {
-                int delay = Math.Max(minDelay, maxDelay - (WorkBlocksVM.Score * delayDecrease));
-                await Task.Delay(delay);
-                WorkBlocksVM.MoveBlockDown.Execute(null);
+                await Task.Delay(500);
+                WorkBlocksVM.MoveBlockDown();
                 Draw();
             }
-
-            GameOverVisibility = true;
-            FinalScoreText = $"Score: {WorkBlocksVM.Score}";
+            WorkBlocksVM.GameOver = true;
         }
 
         private void Draw()
         {
+            if (imageControls == null)
+                return;
             DrawGrid(GameGridVM);
             DrawGhostBlock(WorkBlocksVM.CurrentBlock);
             DrawBlock(WorkBlocksVM.CurrentBlock);
             DrawNextBlock(WorkBlocksVM);
-            DrawHeldBlock(WorkBlocksVM.HeldBlock);
         }
 
         private void DrawGrid(GameGridViewModel grid)
@@ -214,18 +272,6 @@ namespace Tetris.ViewModels
         {
             Block next = blockQueue.NextBlock;
             NextImage = blockImages[next.Id];
-        }
-
-        private void DrawHeldBlock(Block heldBlock)
-        {
-            if (heldBlock == null)
-            {
-                HoldImage = blockImages[0];
-            }
-            else
-            {
-                HoldImage = blockImages[heldBlock.Id];
-            }
         }
     }
 }

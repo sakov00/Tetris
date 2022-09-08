@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Tetris.Commands;
 using Tetris.Models;
 
 namespace Tetris.ViewModels
@@ -24,41 +19,46 @@ namespace Tetris.ViewModels
             typeof(ZBlock)
         };
 
-
-        public Block CurrentBlock { get; set; }
+        public Block CurrentBlock { get; private set; }
 
         public Block NextBlock { get; private set; }
 
-        public Block HeldBlock { get; private set; }
+        public GameGridViewModel GameGridVM { get; set; }
 
-        public bool CanHold { get; private set; }
-
-        public int Score { get; private set; }
-
-        public bool GameOver { get; set; }
-
-        public GameGridViewModel GameGridVM;
-
-        public WorkBlocksViewModel()
+        public int Score
         {
-            MoveBlockLeft = new RelayCommand(MoveBlockLeft_Executed);
-            MoveBlockRight = new RelayCommand(MoveBlockRight_Executed);
-            MoveBlockDown = new RelayCommand(MoveBlockDown_Executed);
-            RotateBlockCW = new RelayCommand(RotateBlockCW_Executed);
-            RotateBlockCCW = new RelayCommand(RotateBlockCCW_Executed);
-            HoldBlock = new RelayCommand(HoldBlock_Executed);
-            DropBlock = new RelayCommand(DropBlock_Executed);
+            get => score;
+            set
+            {
+                score = value;
+                OnPropertyChanged();
+
+            }
+        }
+        private int score;
+
+        public bool GameOver
+        {
+            get => gameOver;
+            set
+            {
+                gameOver = value;
+                OnPropertyChanged();
+
+            }
+        }
+        private bool gameOver;
+
+        public WorkBlocksViewModel(GameGridViewModel gameGridVM)
+        {
+            GameGridVM = gameGridVM;
             NextBlock = RandomBlock();
-            CurrentBlock = GetAndUpdate();
+            CurrentBlock = RandomBlock();
         }
 
-        #region Commands
+        #region KeyManage
 
-        #region --- MoveBlockLeft ---
-
-        public ICommand MoveBlockLeft { get; private set; }
-
-        private void MoveBlockLeft_Executed(object param)
+        public void MoveBlockLeft()
         {
             Move(0, -1);
 
@@ -68,13 +68,7 @@ namespace Tetris.ViewModels
             }
         }
 
-        #endregion --- MoveBlockLeft ---
-
-        #region --- MoveBlockRight ---
-
-        public ICommand MoveBlockRight { get; private set; }
-
-        private void MoveBlockRight_Executed(object param)
+        public void MoveBlockRight()
         {
             Move(0, 1);
 
@@ -84,13 +78,7 @@ namespace Tetris.ViewModels
             }
         }
 
-        #endregion --- MoveBlockRight ---
-
-        #region --- MoveBlockDown ---
-
-        public ICommand MoveBlockDown { get; private set; }
-
-        private void MoveBlockDown_Executed(object param)
+        public void MoveBlockDown()
         {
             Move(1, 0);
 
@@ -101,13 +89,7 @@ namespace Tetris.ViewModels
             }
         }
 
-        #endregion --- MoveBlockRight ---
-
-        #region --- RotateBlockCW ---
-
-        public ICommand RotateBlockCW { get; private set; }
-
-        private void RotateBlockCW_Executed(object param)
+        public void RotateBlockCW()
         {
             CurrentBlock.RotationState = (CurrentBlock.RotationState + 1) % CurrentBlock.Tiles.Length;
 
@@ -124,13 +106,7 @@ namespace Tetris.ViewModels
             }
         }
 
-        #endregion --- RotateBlockCW ---
-
-        #region --- RotateBlockCCW ---
-
-        public ICommand RotateBlockCCW { get; private set; }
-
-        private void RotateBlockCCW_Executed(object param)
+        public void RotateBlockCCW()
         {
             if (CurrentBlock.RotationState == 0)
             {
@@ -147,56 +123,18 @@ namespace Tetris.ViewModels
             }
         }
 
-        #endregion --- RotateBlockCCW ---
-
-        #region --- HoldBlock ---
-
-        public ICommand HoldBlock { get; private set; }
-
-        private void HoldBlock_Executed(object param)
-        {
-            if (!CanHold)
-            {
-                return;
-            }
-
-            if (HeldBlock == null)
-            {
-                HeldBlock = CurrentBlock;
-                CurrentBlock = GetAndUpdate();
-            }
-            else
-            {
-                Block tmp = CurrentBlock;
-                CurrentBlock = HeldBlock;
-                HeldBlock = tmp;
-            }
-
-            CanHold = false;
-        }
-
-        #endregion --- HoldBlock ---
-
-        #region --- DropBlock ---
-
-        public ICommand DropBlock { get; private set; }
-
-        private void DropBlock_Executed(object param)
+        public void DropBlock()
         {
             Move(BlockDropDistance(), 0);
             PlaceBlock();
         }
 
-        #endregion --- DropBlock ---
+        #endregion KeyManage
 
-        #endregion Commands
-
-        public IEnumerable<Position> TilePositions()
+        public void Move(int rows, int columns)
         {
-            foreach (Position p in CurrentBlock.Tiles[CurrentBlock.RotationState])
-            {
-                yield return new Position(p.Row + CurrentBlock.Offset.Row, p.Column + CurrentBlock.Offset.Column);
-            }
+            CurrentBlock.Offset.Row += rows;
+            CurrentBlock.Offset.Column += columns;
         }
 
         private bool BlockFits()
@@ -221,14 +159,33 @@ namespace Tetris.ViewModels
 
             Score += GameGridVM.ClearFullRows();
 
-            if (IsGameOver())
+            if (!(GameGridVM.IsRowEmpty(0) && GameGridVM.IsRowEmpty(1)))
             {
                 GameOver = true;
             }
             else
             {
                 CurrentBlock = GetAndUpdate();
-                CanHold = true;
+            }
+        }
+
+        public int BlockDropDistance()
+        {
+            int drop = GameGridVM.Rows;
+
+            foreach (Position p in TilePositions())
+            {
+                drop = Math.Min(drop, TileDropDistance(p));
+            }
+
+            return drop;
+        }
+
+        public IEnumerable<Position> TilePositions()
+        {
+            foreach (Position p in CurrentBlock.Tiles[CurrentBlock.RotationState])
+            {
+                yield return new Position(p.Row + CurrentBlock.Offset.Row, p.Column + CurrentBlock.Offset.Column);
             }
         }
 
@@ -244,23 +201,16 @@ namespace Tetris.ViewModels
             return drop;
         }
 
-        public int BlockDropDistance()
+        public Block GetAndUpdate()
         {
-            int drop = GameGridVM.Rows;
-
-            foreach (Position p in TilePositions())
+            Block block = NextBlock;
+            block.StartOffset = new Position(GameGridVM.Rows / 2, GameGridVM.Columns / 2);
+            do
             {
-                drop = System.Math.Min(drop, TileDropDistance(p));
+                NextBlock = RandomBlock();
             }
-
-            return drop;
-        }
-
-
-        public void Move(int rows, int columns)
-        {
-            CurrentBlock.Offset.Row += rows;
-            CurrentBlock.Offset.Column += columns;
+            while (block.Id == NextBlock.Id);
+            return block;
         }
 
         public void Reset()
@@ -271,24 +221,11 @@ namespace Tetris.ViewModels
 
         private Block RandomBlock()
         {
-            return (Block)Activator.CreateInstance(blocksTypes[random.Next(blocksTypes.Length)]);
-        }
-
-        public Block GetAndUpdate()
-        {
-            Block block = NextBlock;
-
-            do
-            {
-                NextBlock = RandomBlock();
-            }
-            while (block.Id == NextBlock.Id);
+            var block = (Block)Activator.CreateInstance(blocksTypes[random.Next(blocksTypes.Length)]);
+            int middleOnCanvas = (GameGridVM.Columns / 2) - 1;
+            block.StartOffset = new Position(0, middleOnCanvas);
+            block.Offset = new Position(block.StartOffset.Row, block.StartOffset.Column);
             return block;
-        }
-
-        private bool IsGameOver()
-        {
-            return !(GameGridVM.IsRowEmpty(0) && GameGridVM.IsRowEmpty(1));
         }
     }
 }

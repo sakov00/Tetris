@@ -13,10 +13,5 @@ namespace Tetris.Models
         public virtual int RotationState { get; set; }
 
         public virtual Position Offset { get; set; }
-
-        public Block()
-        {
-            Offset = new Position(StartOffset.Row, StartOffset.Column);
-        }
     }
 }

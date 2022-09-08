@@ -10,7 +10,7 @@ namespace Tetris
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = AutofacConfig.GetContainer.Resolve<MainViewModel>();
+            DataContext = AutofacConfig.GetContainer.Resolve<ManageCanvasViewModel>();
         }
     }
 }
